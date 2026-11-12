@@ -1,396 +1,534 @@
-/* ============================================================
- * FORM · INDEX — 交互
- * 内容在 config.js，这里负责渲染与动效。
- * ============================================================ */
-(function () {
+(() => {
   "use strict";
 
-  var CFG = window.FORM || {};
-  var $ = function (s, el) { return (el || document).querySelector(s); };
-  var $$ = function (s, el) { return Array.prototype.slice.call((el || document).querySelectorAll(s)); };
-  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var fine = window.matchMedia("(pointer: fine)").matches;
+  const cfg = window.UMBRA || {};
+  const $ = (sel, ctx = document) => ctx.querySelector(sel);
+  const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
+  const root = document.documentElement;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const fine = window.matchMedia("(pointer: fine)").matches;
 
-  function esc(value) {
-    return String(value).replace(/[&<>"']/g, function (ch) {
-      return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch];
-    });
+  /* ---------------- content ---------------- */
+
+  const ticker = $("#tickerTrack");
+  if (ticker) {
+    const half = (cfg.marquee || [])
+      .map((w, i) => `<span class="tk${i % 2 ? " ghost" : ""}">${w}<i>✳</i></span>`)
+      .join("");
+    ticker.innerHTML = half + half;
   }
 
-  renderTicker();
-  renderWork();
-  renderStack();
-  renderNow();
+  const workList = $("#workList");
+  (cfg.works || []).forEach((w, i) => {
+    const row = document.createElement("button");
+    row.type = "button";
+    row.className = "work-row";
+    row.dataset.index = String(i);
+    row.dataset.cursor = "OPEN";
+    row.innerHTML =
+      `<span class="w-index mono">${w.index}</span>` +
+      `<span class="w-main"><span class="w-title">${w.title}</span><span class="w-cn">${w.cn}</span></span>` +
+      `<span class="w-meta mono">${w.role}<br>${w.year}</span>` +
+      `<span class="w-arrow" aria-hidden="true">↗</span>`;
+    workList.appendChild(row);
+  });
 
-  initTheme();
-  initClock();
-  initHeader();
-  initMenu();
-  initReveal();
-  initWorkPreview();
-  initCopy();
-  initCursor();
-  initMagnetic();
-  initToTop();
+  const approachGrid = $("#approachGrid");
+  (cfg.approach || []).forEach((a) => {
+    const el = document.createElement("div");
+    el.className = "ap-item reveal";
+    el.innerHTML =
+      `<span class="ap-num">${a.num}</span>` +
+      `<div class="ap-body"><h3 class="ap-title">${a.title}</h3><p class="ap-cn">${a.cn}</p></div>`;
+    approachGrid.appendChild(el);
+  });
 
-  /* ---------- 渲染 ---------- */
-  function renderTicker() {
-    var track = $("#tickerTrack");
-    if (!track || !CFG.ticker) return;
-    var half = CFG.ticker.map(function (t) {
-      return '<span class="ticker-item">' + esc(t) + '</span><span class="ticker-dot"></span>';
-    }).join("");
-    track.innerHTML = half + half;
+  const logList = $("#logList");
+  (cfg.log || []).forEach((l) => {
+    const row = document.createElement("div");
+    row.className = "log-row reveal";
+    row.innerHTML =
+      `<span class="log-when mono"><i class="log-dot"></i>${l.when}</span>` +
+      `<div><h3 class="log-title">${l.title}</h3><p class="log-desc">${l.desc}</p></div>` +
+      `<span class="log-status mono">${l.status}</span>`;
+    logList.appendChild(row);
+  });
+
+  $$("[data-split]").forEach((el) => {
+    const words = el.textContent.trim().split(/\s+/);
+    el.textContent = "";
+    el.classList.add("split");
+    words.forEach((word, i) => {
+      const wrap = document.createElement("span");
+      wrap.className = "w";
+      const inner = document.createElement("span");
+      inner.style.setProperty("--i", String(i));
+      inner.textContent = word;
+      wrap.appendChild(inner);
+      el.appendChild(wrap);
+    });
+  });
+
+  /* ---------------- loader ---------------- */
+
+  const loader = $("#loader");
+  const loaderCount = $("#loaderCount");
+  const loaderBar = $("#loaderBar");
+
+  function boot() {
+    document.body.classList.remove("is-loading");
+    document.body.classList.add("is-ready");
+    window.setTimeout(() => { if (loader) loader.style.display = "none"; }, reduce ? 0 : 1250);
   }
 
-  function renderWork() {
-    var list = $("#workList");
-    if (!list || !CFG.work) return;
-
-    CFG.work.forEach(function (item, i) {
-      var index = String(i + 1).padStart(2, "0");
-      var tag = item.url ? "a" : "div";
-      var attrs = item.url
-        ? ' href="' + esc(item.url) + '" target="_blank" rel="noopener"'
-        : ' aria-label="' + esc(item.title) + '（' + esc(item.note || "视觉实验") + '）"';
-
-      var el = document.createElement(tag);
-      el.className = "work-item" + (item.url ? "" : " is-private");
-      el.setAttribute("data-variant", item.variant || "v4");
-      el.setAttribute("data-initial", item.initial || item.title.charAt(0).toUpperCase());
-      el.setAttribute("data-index", index);
-      el.setAttribute("data-title", item.title);
-      el.innerHTML =
-        '<span class="wi-index">' + index + '</span>' +
-        '<span class="wi-main">' +
-          '<span class="wi-title">' + esc(item.title) +
-            (item.note ? '<span class="wi-private">' + esc(item.note) + '</span>' : '') +
-          '</span>' +
-          '<span class="wi-desc">' + esc(item.desc) + '</span>' +
-        '</span>' +
-        '<span class="wi-tags">' + (item.tags || []).map(function (t) { return '<span>' + esc(t) + '</span>'; }).join("") + '</span>' +
-        '<span class="wi-year">' + esc(item.year) + '</span>' +
-        '<span class="wi-arrow" aria-hidden="true">↗</span>';
-      el.setAttribute("style", "--d:" + (i * 0.06) + "s");
-      el.classList.add("reveal");
-      if (item.url) el.setAttribute("href", item.url);
-      if (item.url) {
-        el.setAttribute("target", "_blank");
-        el.setAttribute("rel", "noopener");
-      }
-      list.appendChild(el);
-    });
+  if (reduce || !loaderCount || !loaderBar) {
+    boot();
+  } else {
+    const duration = 1250;
+    const started = performance.now();
+    const step = (now) => {
+      const p = Math.min(1, (now - started) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      loaderCount.textContent = String(Math.round(eased * 100)).padStart(2, "0");
+      loaderBar.style.width = `${eased * 100}%`;
+      if (p < 1) requestAnimationFrame(step);
+      else window.setTimeout(boot, 180);
+    };
+    requestAnimationFrame(step);
   }
 
-  function renderStack() {
-    var grid = $("#stackGrid");
-    if (!grid || !CFG.stack) return;
-    CFG.stack.forEach(function (group, i) {
-      var el = document.createElement("article");
-      el.className = "stack-card reveal";
-      el.style.setProperty("--d", (i * 0.07) + "s");
-      el.innerHTML =
-        '<div class="stack-k"><span>' + esc(group.en) + '</span><span>' + String(i + 1).padStart(2, "0") + '</span></div>' +
-        '<h3 class="stack-cn">' + esc(group.cn) + '</h3>' +
-        '<ul class="stack-tags">' + group.items.map(function (t) { return '<li><span>' + esc(t) + '</span></li>'; }).join("") + '</ul>';
-      grid.appendChild(el);
-    });
-  }
+  /* ---------------- reveal ---------------- */
 
-  function renderNow() {
-    var list = $("#nowList");
-    if (!list || !CFG.now) return;
-    CFG.now.forEach(function (item) {
-      var el = document.createElement("div");
-      el.className = "now-item";
-      el.innerHTML =
-        '<span class="now-k">' + esc(item.k) + '</span>' +
-        '<div><div class="now-t">' + esc(item.t) + '</div><div class="now-d">' + esc(item.d) + '</div></div>';
-      list.appendChild(el);
-    });
-  }
-
-  /* ---------- 主题 ---------- */
-  function initTheme() {
-    var root = document.documentElement;
-    var btn = $("#themeBtn");
-    if (!btn) return;
-
-    function apply(theme) {
-      root.setAttribute("data-theme", theme);
-      root.style.colorScheme = theme;
-      btn.setAttribute("aria-label", theme === "dark" ? "切换到浅色模式" : "切换到深色模式");
-      var meta = $('meta[name="theme-color"]');
-      if (meta) meta.setAttribute("content", theme === "dark" ? "#0c0c0b" : "#f2efe8");
-      try { localStorage.setItem("form-theme", theme); } catch (e) {}
-    }
-
-    btn.addEventListener("click", function () {
-      apply(root.getAttribute("data-theme") === "dark" ? "light" : "dark");
-    });
-
-    apply(root.getAttribute("data-theme") || "light");
-  }
-
-  /* ---------- 时钟 ---------- */
-  function initClock() {
-    var clock = $("#clock");
-    var yearEls = [$("#year"), $("#heroYear")];
-    var timeFmt = new Intl.DateTimeFormat("en-GB", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false
-    });
-    var yearFmt = new Intl.DateTimeFormat("en-GB", { year: "numeric" });
-
-    function tick() {
-      var now = new Date();
-      if (clock) clock.textContent = timeFmt.format(now);
-      yearEls.forEach(function (el) {
-        if (el) el.textContent = el.id === "heroYear" ? "© " + yearFmt.format(now) : yearFmt.format(now);
-      });
-    }
-
-    tick();
-    window.setInterval(tick, 1000);
-  }
-
-  /* ---------- 顶栏 / 进度 / 导航高亮 ---------- */
-  function initHeader() {
-    var head = $("#siteHead");
-    var progress = $("#progress");
-    var navLinks = $$(".site-nav a");
-    var ticking = false;
-
-    function update() {
-      var y = window.scrollY || window.pageYOffset;
-      var max = document.documentElement.scrollHeight - window.innerHeight;
-      if (head) head.classList.toggle("is-scrolled", y > 16);
-      if (progress) progress.style.transform = "scaleX(" + (max > 0 ? Math.min(1, y / max) : 0) + ")";
-      ticking = false;
-    }
-
-    window.addEventListener("scroll", function () {
-      if (!ticking) {
-        ticking = true;
-        window.requestAnimationFrame(update);
-      }
-    }, { passive: true });
-    window.addEventListener("resize", update, { passive: true });
-    update();
-
-    if (!("IntersectionObserver" in window) || !navLinks.length) return;
-    var map = {};
-    navLinks.forEach(function (a) { map[a.getAttribute("data-nav")] = a; });
-
-    var spy = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        navLinks.forEach(function (a) { a.classList.remove("is-active"); });
-        var active = map[entry.target.id];
-        if (active) active.classList.add("is-active");
-      });
-    }, { rootMargin: "-42% 0px -54% 0px", threshold: 0 });
-
-    ["about", "work", "stack", "now", "contact"].forEach(function (id) {
-      var el = document.getElementById(id);
-      if (el) spy.observe(el);
-    });
-  }
-
-  /* ---------- 移动菜单 ---------- */
-  function initMenu() {
-    var btn = $("#menuBtn");
-    var menu = $("#mobileMenu");
-    if (!btn || !menu) return;
-
-    function setMenu(open, focusFirst) {
-      menu.classList.toggle("is-open", open);
-      document.body.classList.toggle("menu-open", open);
-      btn.setAttribute("aria-expanded", open ? "true" : "false");
-      btn.setAttribute("aria-label", open ? "关闭菜单" : "打开菜单");
-      menu.setAttribute("aria-hidden", open ? "false" : "true");
-      if (open && focusFirst) {
-        var first = menu.querySelector("a");
-        if (first) window.setTimeout(function () { first.focus(); }, 120);
-      }
-    }
-
-    btn.addEventListener("click", function (e) {
-      setMenu(!menu.classList.contains("is-open"), e.detail === 0);
-    });
-
-    $$("a", menu).forEach(function (a) {
-      a.addEventListener("click", function () { setMenu(false); });
-    });
-
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && menu.classList.contains("is-open")) {
-        setMenu(false);
-        btn.focus();
-      }
-    });
-  }
-
-  /* ---------- 滚动显现 ---------- */
-  function initReveal() {
-    var items = $$(".reveal");
-    if (!("IntersectionObserver" in window) || reduced) {
-      items.forEach(function (el) { el.classList.add("is-in"); });
-      return;
-    }
-
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
+  const revealTargets = $$(".reveal, .split");
+  if (reduce) {
+    revealTargets.forEach((el) => el.classList.add("is-in"));
+  } else {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
         entry.target.classList.add("is-in");
         io.unobserve(entry.target);
       });
-    }, { threshold: 0.08, rootMargin: "0px 0px -8% 0px" });
-
-    items.forEach(function (el) { io.observe(el); });
+    }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+    revealTargets.forEach((el) => io.observe(el));
   }
 
-  /* ---------- 作品悬浮预览 ---------- */
-  function initWorkPreview() {
-    var preview = $("#workPreview");
-    var visual = $("#wpVisual");
-    var indexEl = $("#wpIndex");
-    var titleEl = $("#wpTitle");
-    if (!preview || !visual || !fine) return;
+  /* ---------------- header + progress ---------------- */
 
-    var items = $$(".work-item");
+  const head = $("#head");
+  const progressBar = $("#progressBar");
+  let lastY = window.scrollY;
+  let scrollQueued = false;
 
-    function move(e) {
-      var pad = 18;
-      var w = preview.offsetWidth || 320;
-      var h = preview.offsetHeight || 240;
-      var x = e.clientX + 24;
-      var y = e.clientY;
-      if (x + w > window.innerWidth - pad) x = e.clientX - w - 24;
-      x = Math.max(pad, Math.min(x, window.innerWidth - w - pad));
-      y = Math.max(pad + h / 2, Math.min(y, window.innerHeight - h / 2 - pad));
-      preview.style.left = x + "px";
-      preview.style.top = y + "px";
+  function onScroll() {
+    const y = window.scrollY;
+    const vh = window.innerHeight;
+    if (head) {
+      head.classList.toggle("is-solid", y > vh * 0.5);
+      if (Math.abs(y - lastY) > 8) {
+        head.classList.toggle("is-hidden", y > lastY && y > vh * 0.9);
+        lastY = y;
+      }
     }
+    if (progressBar) {
+      const max = document.documentElement.scrollHeight - vh;
+      progressBar.style.transform = `scaleX(${max > 0 ? Math.min(1, y / max) : 0})`;
+    }
+    scrollQueued = false;
+  }
 
-    items.forEach(function (item) {
-      item.addEventListener("mouseenter", function (e) {
-        visual.setAttribute("data-variant", item.getAttribute("data-variant") || "v4");
-        visual.setAttribute("data-initial", item.getAttribute("data-initial") || "Q");
-        indexEl.textContent = item.getAttribute("data-index") || "";
-        titleEl.textContent = item.getAttribute("data-title") || "";
-        preview.classList.add("is-on");
-        move(e);
-      });
-      item.addEventListener("mousemove", move);
-      item.addEventListener("mouseleave", function () {
-        preview.classList.remove("is-on");
-      });
+  window.addEventListener("scroll", () => {
+    if (scrollQueued) return;
+    scrollQueued = true;
+    requestAnimationFrame(onScroll);
+  }, { passive: true });
+  onScroll();
+
+  /* ---------------- nav scramble ---------------- */
+
+  const glyphs = "ABCDEFGHIJKLMNOPQRSTUVWXYZ#/—+*";
+  $$(".scramble").forEach((el) => {
+    const original = el.textContent;
+    let timer = null;
+    el.addEventListener("pointerenter", () => {
+      if (reduce || timer) return;
+      let frame = 0;
+      const total = 14;
+      timer = window.setInterval(() => {
+        frame += 1;
+        el.textContent = original
+          .split("")
+          .map((ch) => (ch === " " ? " " : Math.random() < frame / total ? ch : glyphs[(Math.random() * glyphs.length) | 0]))
+          .join("");
+        if (frame >= total) {
+          window.clearInterval(timer);
+          timer = null;
+          el.textContent = original;
+        }
+      }, 30);
+    });
+  });
+
+  /* ---------------- menu ---------------- */
+
+  const menu = $("#menu");
+  const menuBtn = $("#menuBtn");
+
+  function setMenu(open) {
+    if (!menu || !menuBtn) return;
+    menu.classList.toggle("is-open", open);
+    menu.setAttribute("aria-hidden", String(!open));
+    menuBtn.setAttribute("aria-expanded", String(open));
+    document.body.classList.toggle("is-locked", open);
+  }
+
+  if (menuBtn) {
+    menuBtn.addEventListener("click", () => setMenu(!menu.classList.contains("is-open")));
+    $$(".menu-nav a").forEach((a) => a.addEventListener("click", () => setMenu(false)));
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && menu.classList.contains("is-open")) setMenu(false);
     });
   }
+  /* ---------------- work dialog ---------------- */
 
-  /* ---------- 复制邮箱 ---------- */
-  function initCopy() {
-    var toast = $("#toast");
-    var timer = null;
+  const dialog = $("#workDialog");
+  const wdMesh = $("#wdMesh");
+  const wdIndex = $("#wdIndex");
+  const wdTitle = $("#wdTitle");
+  const wdCn = $("#wdCn");
+  const wdDesc = $("#wdDesc");
+  const wdMeta = $("#wdMeta");
 
-    function showToast(msg) {
-      if (!toast) return;
-      toast.textContent = msg;
-      toast.classList.add("is-on");
-      window.clearTimeout(timer);
-      timer = window.setTimeout(function () { toast.classList.remove("is-on"); }, 2200);
+  function openWork(i) {
+    const w = (cfg.works || [])[i];
+    if (!w || !dialog) return;
+    if (wdMesh) wdMesh.className = `mesh mesh--${w.variant}`;
+    if (wdIndex) wdIndex.textContent = `${w.index} / ${w.year}`;
+    if (wdTitle) wdTitle.textContent = w.title;
+    if (wdCn) wdCn.textContent = w.cn;
+    if (wdDesc) wdDesc.textContent = w.desc;
+    if (wdMeta) {
+      wdMeta.innerHTML =
+        `<div><dt>YEAR</dt><dd>${w.year}</dd></div>` +
+        `<div><dt>DISCIPLINE</dt><dd>${w.role}</dd></div>` +
+        `<div><dt>TAGS</dt><dd>${w.tags.join(" · ")}</dd></div>` +
+        `<div><dt>STATUS</dt><dd>Visual study</dd></div>`;
     }
+    document.body.classList.add("is-locked");
+    if (typeof dialog.showModal === "function") dialog.showModal();
+    else dialog.setAttribute("open", "");
+  }
 
-    function copy(text) {
-      function done() { showToast("已复制 " + text); }
-      function fallback() {
-        var ta = document.createElement("textarea");
-        ta.value = text;
-        ta.style.position = "fixed";
-        ta.style.opacity = "0";
-        document.body.appendChild(ta);
-        ta.select();
-        try { document.execCommand("copy"); done(); } catch (e) { showToast(text); }
-        document.body.removeChild(ta);
-      }
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(done, fallback);
+  function closeWork() {
+    if (!dialog) return;
+    if (typeof dialog.close === "function") dialog.close();
+    else dialog.removeAttribute("open");
+    document.body.classList.remove("is-locked");
+  }
+
+  if (workList) {
+    workList.addEventListener("click", (e) => {
+      const row = e.target.closest(".work-row");
+      if (row) openWork(Number(row.dataset.index));
+    });
+  }
+  const wdClose = $("#wdClose");
+  if (wdClose) wdClose.addEventListener("click", closeWork);
+  if (dialog) {
+    dialog.addEventListener("click", (e) => { if (e.target === dialog) closeWork(); });
+    dialog.addEventListener("close", () => document.body.classList.remove("is-locked"));
+  }
+
+  /* ---------------- pointer + floating preview ---------------- */
+
+  const pointer = {
+    x: window.innerWidth / 2,
+    y: window.innerHeight / 2,
+    fx: window.innerWidth / 2,
+    fy: window.innerHeight / 2,
+    moved: false
+  };
+
+  window.addEventListener("pointermove", (e) => {
+    pointer.x = e.clientX;
+    pointer.y = e.clientY;
+    if (!pointer.moved) {
+      pointer.fx = e.clientX;
+      pointer.fy = e.clientY;
+      pointer.moved = true;
+    }
+  }, { passive: true });
+
+  const float = $("#workFloat");
+  const wfMesh = $("#wfMesh");
+  const wfLabel = $("#wfLabel");
+  const wfIndex = $("#wfIndex");
+
+  if (workList && float && fine && !reduce) {
+    workList.addEventListener("pointerover", (e) => {
+      const row = e.target.closest(".work-row");
+      if (!row) return;
+      const w = (cfg.works || [])[Number(row.dataset.index)];
+      if (!w) return;
+      if (wfMesh) wfMesh.className = `mesh mesh--${w.variant}`;
+      if (wfLabel) wfLabel.textContent = w.title;
+      if (wfIndex) wfIndex.textContent = w.index;
+      float.classList.add("is-on");
+    });
+    workList.addEventListener("pointerleave", () => float.classList.remove("is-on"));
+    window.addEventListener("scroll", () => float.classList.remove("is-on"), { passive: true });
+  }
+
+  /* ---------------- cursor ---------------- */
+
+  const cursor = $("#cursor");
+  const cursorLabel = $("#cursorLabel");
+
+  if (cursor && fine && !reduce) {
+    root.classList.add("has-cursor");
+    let cx = pointer.x;
+    let cy = pointer.y;
+
+    document.addEventListener("pointermove", (e) => {
+      const hit = e.target.closest ? e.target.closest("[data-cursor]") : null;
+      if (hit) {
+        if (cursorLabel) cursorLabel.textContent = hit.dataset.cursor || "";
+        cursor.classList.add("is-label");
       } else {
-        fallback();
-      }
-    }
-
-    $$("[data-mail]").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        copy(btn.getAttribute("data-mail"));
-      });
-    });
-  }
-
-  /* ---------- 自定义光标 ---------- */
-  function initCursor() {
-    if (!fine || reduced) return;
-    var dot = $(".cursor-dot");
-    var ring = $(".cursor-ring");
-    if (!dot || !ring) return;
-
-    var mx = window.innerWidth / 2;
-    var my = window.innerHeight / 2;
-    var rx = mx;
-    var ry = my;
-    var shown = false;
-
-    function render() {
-      rx += (mx - rx) * 0.16;
-      ry += (my - ry) * 0.16;
-      dot.style.transform = "translate3d(" + mx + "px," + my + "px,0) translate(-50%,-50%)";
-      ring.style.transform = "translate3d(" + rx + "px," + ry + "px,0) translate(-50%,-50%)";
-      window.requestAnimationFrame(render);
-    }
-
-    window.addEventListener("mousemove", function (e) {
-      mx = e.clientX;
-      my = e.clientY;
-      if (!shown) {
-        shown = true;
-        document.body.classList.add("has-cursor");
-        window.requestAnimationFrame(render);
+        cursor.classList.remove("is-label");
+        if (cursorLabel) cursorLabel.textContent = "";
       }
     }, { passive: true });
 
-    function bind(el) {
-      el.addEventListener("mouseenter", function () { document.body.classList.add("cursor-hover"); });
-      el.addEventListener("mouseleave", function () { document.body.classList.remove("cursor-hover"); });
+    document.addEventListener("mouseleave", () => cursor.classList.remove("is-visible"));
+
+    const loop = () => {
+      cx += (pointer.x - cx) * 0.22;
+      cy += (pointer.y - cy) * 0.22;
+      if (pointer.moved) cursor.classList.add("is-visible");
+      cursor.style.transform = `translate3d(${cx}px,${cy}px,0) translate(-50%,-50%)`;
+      if (float && float.classList.contains("is-on")) {
+        pointer.fx += (pointer.x - pointer.fx) * 0.14;
+        pointer.fy += (pointer.y - pointer.fy) * 0.14;
+        float.style.transform = `translate3d(${pointer.fx}px,${pointer.fy}px,0) translate(-50%,-50%)`;
+      }
+      requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
+  }
+
+  /* ---------------- footer button ---------------- */
+
+  const toTop = $("#toTop");
+  if (toTop) {
+    if (fine && !reduce) {
+      toTop.addEventListener("pointermove", (e) => {
+        const r = toTop.getBoundingClientRect();
+        const dx = (e.clientX - (r.left + r.width / 2)) * 0.16;
+        const dy = (e.clientY - (r.top + r.height / 2)) * 0.16;
+        toTop.style.transform = `translate(${dx}px,${dy}px)`;
+      });
+      toTop.addEventListener("pointerleave", () => { toTop.style.transform = ""; });
+    }
+    toTop.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+    });
+  }
+
+  /* ---------------- hero shader ---------------- */
+
+  function initGL() {
+    const canvas = $("#gl");
+    if (!canvas) return;
+    const gl = canvas.getContext("webgl", {
+      alpha: false,
+      antialias: false,
+      depth: false,
+      stencil: false,
+      powerPreference: "low-power"
+    });
+    if (!gl) {
+      root.classList.add("no-gl");
+      return;
     }
 
-    $$("a, button, .work-item").forEach(bind);
-  }
+    const vs = `attribute vec2 a; void main(){ gl_Position = vec4(a, 0.0, 1.0); }`;
+    const fs = `
+      precision highp float;
+      uniform vec2 uRes;
+      uniform float uTime;
+      uniform vec2 uMouse;
 
-  /* ---------- 磁吸按钮 ---------- */
-  function initMagnetic() {
-    if (!fine || reduced) return;
-    $$(".magnetic").forEach(function (el) {
-      el.addEventListener("mousemove", function (e) {
-        var r = el.getBoundingClientRect();
-        var x = e.clientX - r.left - r.width / 2;
-        var y = e.clientY - r.top - r.height / 2;
-        el.style.transform = "translate(" + (x * 0.16) + "px," + (y * 0.24) + "px)";
-      });
-      el.addEventListener("mouseleave", function () {
-        el.style.transform = "";
-      });
+      float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }
+
+      float noise(vec2 p){
+        vec2 i = floor(p);
+        vec2 f = fract(p);
+        vec2 u = f * f * (3.0 - 2.0 * f);
+        return mix(
+          mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),
+          mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x),
+          u.y
+        );
+      }
+
+      float fbm(vec2 p){
+        float v = 0.0;
+        float a = 0.5;
+        for(int i = 0; i < 5; i++){
+          v += a * noise(p);
+          p *= 2.03;
+          a *= 0.5;
+        }
+        return v;
+      }
+
+      void main(){
+        vec2 p = (gl_FragCoord.xy - 0.5 * uRes.xy) / uRes.y;
+        float t = uTime * 0.055;
+
+        vec2 q = vec2(
+          fbm(p * 1.3 + vec2(0.0, t)),
+          fbm(p * 1.3 + vec2(5.2, -t))
+        );
+        vec2 r = vec2(
+          fbm(p * 1.3 + 2.0 * q + vec2(1.7, 9.2) + t * 0.7),
+          fbm(p * 1.3 + 2.0 * q + vec2(8.3, 2.8) - t * 0.5)
+        );
+        float f = fbm(p * 1.15 + 2.3 * r);
+
+        vec3 col = vec3(0.028, 0.030, 0.034);
+        vec3 silver = vec3(0.30, 0.31, 0.34);
+        vec3 lime = vec3(0.64, 0.90, 0.10);
+
+        float band = smoothstep(0.34, 0.86, f);
+        col = mix(col, silver * 0.5, band * 0.5);
+
+        float filament = smoothstep(0.70, 0.97, f);
+        float depth = smoothstep(0.05, 0.85, gl_FragCoord.y / uRes.y);
+        col = mix(col, lime, filament * 0.30 * (0.35 + 0.65 * depth));
+
+        float d = length(p - uMouse);
+        col += lime * 0.05 * smoothstep(0.6, 0.0, d);
+
+        col *= 1.0 - 0.55 * pow(length(p * vec2(0.85, 1.15)), 1.7);
+
+        float g = hash(gl_FragCoord.xy + fract(uTime) * 137.0);
+        col += (g - 0.5) * 0.032;
+
+        gl_FragColor = vec4(col, 1.0);
+      }
+    `;
+
+    function compile(type, src) {
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+        console.warn("UMBRA shader:", gl.getShaderInfoLog(s));
+        return null;
+      }
+      return s;
+    }
+
+    const v = compile(gl.VERTEX_SHADER, vs);
+    const f = compile(gl.FRAGMENT_SHADER, fs);
+    if (!v || !f) { root.classList.add("no-gl"); return; }
+
+    const prog = gl.createProgram();
+    gl.attachShader(prog, v);
+    gl.attachShader(prog, f);
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+      console.warn("UMBRA program:", gl.getProgramInfoLog(prog));
+      root.classList.add("no-gl");
+      return;
+    }
+    gl.useProgram(prog);
+
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(prog, "a");
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+    const uRes = gl.getUniformLocation(prog, "uRes");
+    const uTime = gl.getUniformLocation(prog, "uTime");
+    const uMouse = gl.getUniformLocation(prog, "uMouse");
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.6);
+    const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
+
+    canvas.addEventListener("pointermove", (e) => {
+      const r = canvas.getBoundingClientRect();
+      if (!r.height) return;
+      mouse.tx = (e.clientX - r.left - r.width / 2) / r.height;
+      mouse.ty = -(e.clientY - r.top - r.height / 2) / r.height;
+    }, { passive: true });
+
+    function resize() {
+      const w = Math.max(1, Math.round(canvas.clientWidth * dpr));
+      const h = Math.max(1, Math.round(canvas.clientHeight * dpr));
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+        gl.viewport(0, 0, w, h);
+      }
+    }
+
+    function draw(now) {
+      resize();
+      mouse.x += (mouse.tx - mouse.x) * 0.05;
+      mouse.y += (mouse.ty - mouse.y) * 0.05;
+      gl.uniform2f(uRes, canvas.width, canvas.height);
+      gl.uniform1f(uTime, now);
+      gl.uniform2f(uMouse, mouse.x, mouse.y);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    }
+
+    if (reduce) {
+      resize();
+      draw(16.0);
+      return;
+    }
+
+    let raf = 0;
+    let running = false;
+    let last = performance.now();
+    let time = 0;
+
+    function frame(now) {
+      time += Math.min(0.05, (now - last) / 1000);
+      last = now;
+      draw(time);
+      if (running) raf = requestAnimationFrame(frame);
+    }
+
+    function setRunning(on) {
+      if (on === running) return;
+      running = on;
+      if (on) {
+        last = performance.now();
+        raf = requestAnimationFrame(frame);
+      } else {
+        cancelAnimationFrame(raf);
+      }
+    }
+
+    const io = new IntersectionObserver(([entry]) => {
+      setRunning(entry.isIntersecting && !document.hidden);
+    }, { threshold: 0 });
+    io.observe(canvas);
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) setRunning(false);
+      else {
+        const r = canvas.getBoundingClientRect();
+        if (r.bottom > 0 && r.top < window.innerHeight) setRunning(true);
+      }
     });
   }
 
-  /* ---------- 回到顶部 ---------- */
-  function initToTop() {
-    var btn = $("#toTop");
-    if (!btn) return;
-    btn.addEventListener("click", function () {
-      window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
-    });
-  }
+  initGL();
 })();

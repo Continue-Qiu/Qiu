@@ -1,64 +1,36 @@
-# FORM · INDEX
+# UMBRA® — A Visual Index
 
-一个纯视觉的个人主页模板 —— 编辑感 × 技术感。**纯静态、零依赖、无构建**，双击 `index.html` 就能跑。
+一个匿名的个人视觉主页：深色画布、生成式光场、超大动态字体，以及一套克制的滚动叙事。
 
-页面不展示任何个人信息：没有姓名、联系方式、坐标与外部账号，只保留排版、动效与界面实验。
+## 特点
 
-## 目录结构
+- 纯静态：一个 `index.html` + 一份 CSS + 两个 JS 文件，零依赖、无构建
+- 生成式首屏：WebGL 噪声光场，随滚动与指针轻微变化；不支持时回退到 CSS 光斑
+- 内容与代码分离：所有文案、作品、原则、日志都在 `js/config.js`
+- 无追踪、无表单、无个人信息、无外部请求
+- 响应式、可键盘操作、支持 `prefers-reduced-motion`
+
+## 结构
 
 ```
-├── index.html        页面骨架
-├── css/style.css     全部样式（浅色 / 深色主题）
-├── js/config.js      内容配置（改文案、项目、工具、近况只动这里）
-├── js/main.js        渲染与交互
-├── assets/fonts/     自托管字体（Instrument Serif / Geist / Geist Mono）
-└── assets/favicon.svg
+index.html
+css/style.css
+js/config.js      内容配置
+js/main.js        渲染、交互、WebGL
+assets/fonts/     Instrument Serif / Geist / Geist Mono（自托管）
+assets/favicon.svg
 ```
 
 ## 本地预览
 
-直接双击 `index.html`，或起一个静态服务：
-
 ```bash
-python -m http.server 8080
-# 打开 http://localhost:8080
+npx serve .
 ```
 
-## 修改内容
+打开终端里给出的地址即可。
 
-编辑 `js/config.js`：
+## 设计说明
 
-| 字段 | 内容 |
-| --- | --- |
-| `brand` | 站点名与副标题 |
-| `ticker` | 首屏下方滚动的关键词 |
-| `work` | 作品列表（标题、描述、标签、年份、链接、预览配色） |
-| `stack` | 工具分组 |
-| `now` | 「04 现在」的三条近况 |
-
-作品 `url` 留空表示不生成外链；`variant` 决定悬浮预览的配色（`v1` / `v2` / `v3` / `v4`）。
-
-刷新页面即可生效，不需要改其它文件。
-
-## 特性
-
-- 暖纸浅色主题 + 朱红强调色，支持深浅色切换并记住偏好
-- 首屏英文大标题逐行入场、关键词跑马灯、本地实时时钟
-- 作品列表悬浮预览、磁吸按钮、自定义光标
-- 滚动显现、阅读进度、导航高亮、移动端菜单
-- 响应式布局、`prefers-reduced-motion` 适配、无 JS 时的内容兜底
-
-## 隐私
-
-- 不收集任何个人信息，无账号、无表单、无 Cookie
-- 不加载第三方脚本、统计代码或远程字体
-- 主题偏好仅保存在浏览器本地
-
-## 关于旧版
-
-上一版为深色 HUD 科技风 + WebGL 地球，已整体替换。旧文件仍保留在 Git 历史中，
-需要时可通过 `git log` / `git checkout <commit> -- <file>` 找回。
-
----
-
-© 2026 FORM · 一个纯视觉的静态页面
+- 单一强调色 `#c9f24d`，其余全部交给黑白灰与留白
+- 字体：Geist（无衬线）+ Instrument Serif Italic（强调词）+ Geist Mono（技术注脚）
+- 动效只做三件事：出现、跟随、退出；不做无意义的循环装饰

@@ -1,114 +1,108 @@
 /* ============================================================
- * FORM · 内容配置
- * 改文案、项目、工具、近况，只动这个文件就够了。
+ * UMBRA · 内容配置
+ * 站点上的所有文字都在这里。改内容不需要碰 main.js。
  * ============================================================ */
-window.FORM = {
-  brand: {
-    name: "FORM",
-    alias: "INDEX"
-  },
+window.UMBRA = {
+  brand: "UMBRA",
+  tag: "A VISUAL INDEX",
+  year: "2026",
 
-  /* 首屏下方滚动的关键词 */
-  ticker: [
-    "LAYOUT",
-    "TYPOGRAPHY",
-    "MOTION",
-    "GRID",
-    "COLOR",
-    "INTERFACE",
-    "HTML",
-    "CSS",
-    "JAVASCRIPT",
-    "NO BUILD",
-    "ALWAYS MAKING"
-  ],
+  marquee: ["SIGNAL", "SILENCE", "STRUCTURE", "MOTION", "TYPE", "CODE"],
 
-  /* 02 作品
-     variant 决定悬浮预览的配色：v1 / v2 / v3 / v4
-     url 留空 = 不生成外链 */
-  work: [
+  works: [
     {
-      title: "Grid Study",
-      desc: "栅格与留白的比例练习，用最少的元素撑起页面骨架。",
-      tags: ["Layout", "Grid"],
+      index: "01",
+      title: "Null Field",
+      cn: "空场",
       year: "2026",
-      url: "",
-      note: "视觉实验",
-      variant: "v1",
-      initial: "G"
+      role: "GENERATIVE / MOTION",
+      desc: "从空白开始，让噪声自己长出结构。一次关于「少」的生成实验：没有主体，只有密度和光。",
+      tags: ["Canvas", "Shader", "Type"],
+      variant: "lime"
     },
     {
-      title: "Motion Notes",
-      desc: "滚动、悬停与缓动的节奏实验，让静态页面有呼吸感。",
-      tags: ["CSS", "Motion"],
-      year: "2026",
-      url: "",
-      note: "视觉实验",
-      variant: "v2",
-      initial: "M"
+      index: "02",
+      title: "Soft Machine",
+      cn: "软机器",
+      year: "2025",
+      role: "INTERFACE / MOTION",
+      desc: "把界面的边缘磨圆，让数字的东西看起来可以被触摸。缓动是这里唯一的材质。",
+      tags: ["Interface", "Easing", "Grid"],
+      variant: "ember"
     },
     {
-      title: "Type Shelf",
-      desc: "衬线与无衬线的混排实验，标题、注脚与数字对齐。",
-      tags: ["Typography", "Editorial"],
-      year: "2026",
-      url: "",
-      note: "视觉实验",
-      variant: "v3",
-      initial: "T"
+      index: "03",
+      title: "Afterimage",
+      cn: "余像",
+      year: "2025",
+      role: "TYPE / EXPERIMENT",
+      desc: "文字离开之后，颜色还留在视网膜上。关于延迟、残影与记忆的排版练习。",
+      tags: ["Typography", "Color", "Delay"],
+      variant: "ice"
     },
     {
-      title: "This Index",
-      desc: "你正在看的这一页：零依赖、无构建、纯静态。",
-      tags: ["HTML", "CSS", "JavaScript"],
-      year: "2026",
-      url: "",
-      note: "视觉实验",
-      variant: "v4",
-      initial: "I"
+      index: "04",
+      title: "Signal / Noise",
+      cn: "信号与噪声",
+      year: "2025",
+      role: "DATA / VISUAL",
+      desc: "在可读与不可读之间摆动，让数据拥有呼吸。秩序不是结果，只是一个暂时的状态。",
+      tags: ["Data", "Noise", "Rhythm"],
+      variant: "violet"
+    },
+    {
+      index: "05",
+      title: "Chrome Study",
+      cn: "铬",
+      year: "2024",
+      role: "MATERIAL / STUDY",
+      desc: "没有材质，只有光。用渐变和模糊模拟一块并不存在的金属，以及它反射出的房间。",
+      tags: ["Material", "Light", "Chrome"],
+      variant: "chrome"
     }
   ],
 
-  /* 03 工具 */
-  stack: [
+  approach: [
     {
-      cn: "语言",
-      en: "LANGUAGES",
-      items: ["HTML", "CSS", "JavaScript", "TypeScript", "Python"]
+      num: "01",
+      title: "FORM",
+      cn: "结构先于装饰。先用网格把话说清楚，再考虑它长什么样。"
     },
     {
-      cn: "排版",
-      en: "TYPESETTING",
-      items: ["Instrument Serif", "Geist", "Geist Mono", "网格", "留白"]
+      num: "02",
+      title: "MOTION",
+      cn: "动效是语气，不是表演。每一次位移都应该有理由，而不是为了显得高级。"
     },
     {
-      cn: "动效",
-      en: "MOTION",
-      items: ["CSS Transitions", "Keyframes", "IntersectionObserver", "缓动", "克制"]
+      num: "03",
+      title: "RESTRAINT",
+      cn: "少一样东西，就多一分准确。留白不是空的，是被留出来的。"
     },
     {
-      cn: "原则",
-      en: "PRINCIPLES",
-      items: ["零依赖", "无构建", "响应式", "无障碍", "无追踪"]
+      num: "04",
+      title: "CRAFT",
+      cn: "细节决定可信度。字距、对齐、缓动曲线，都是态度的一部分。"
     }
   ],
 
-  /* 04 现在 */
-  now: [
+  log: [
     {
-      k: "MAKING",
-      t: "界面与排版实验",
-      d: "把同一套结构，换成不同的字体、留白与节奏。"
+      when: "2026.11",
+      status: "ONGOING",
+      title: "生成式视觉系统",
+      desc: "让同一套规则，每次渲染出不同的结果。「一致」和「意外」之间，留一条窄缝。"
     },
     {
-      k: "EXPLORING",
-      t: "动效与微交互",
-      d: "滚动、悬停、缓动——让页面看起来是活的。"
+      when: "2026.10",
+      status: "STUDYING",
+      title: "动态字体与节奏",
+      desc: "研究文字在时间轴上的呼吸：什么时候该停，什么时候该被推走。"
     },
     {
-      k: "PRINCIPLE",
-      t: "零依赖 · 无构建",
-      d: "一个 index.html 加一份 CSS，双击就能跑。"
+      when: "2026.09",
+      status: "BUILDING",
+      title: "零依赖的交互实验",
+      desc: "不用框架，把原生能力用到极限。一个 HTML、一份 CSS、一段 JavaScript。"
     }
   ]
 };

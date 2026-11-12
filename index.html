@@ -1,178 +1,96 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="light">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>FORM · INDEX — 视觉作品集</title>
-  <meta name="description" content="一个纯视觉的作品集：排版、留白与动效实验。零依赖、无构建的静态页面。">
-  <meta name="theme-color" content="#f2efe8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>UMBRA® — A Study in Signal &amp; Silence</title>
+  <meta name="description" content="一个匿名的视觉索引：光、网格、字体与动效实验。">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#08090a">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="FORM · INDEX">
-  <meta property="og:description" content="一个纯视觉的作品集：排版、留白与动效实验。">
-  <meta name="twitter:card" content="summary">
+  <meta property="og:title" content="UMBRA® — A Study in Signal &amp; Silence">
+  <meta property="og:description" content="SIGNAL · SILENCE · STRUCTURE · MOTION">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preload" href="assets/fonts/geist-var.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/instrument-serif-italic.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/style.css">
-  <noscript><style>.reveal{opacity:1;transform:none}</style></noscript>
-  <script>
-    (function () {
-      try {
-        var saved = localStorage.getItem('form-theme');
-        var theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        document.documentElement.setAttribute('data-theme', theme);
-        document.documentElement.style.colorScheme = theme;
-        var meta = document.querySelector('meta[name="theme-color"]');
-        if (meta) meta.setAttribute('content', theme === 'dark' ? '#0c0c0b' : '#f2efe8');
-      } catch (e) {}
-    })();
-  </script>
+  <noscript><style>.loader{display:none!important}.line-inner{transform:none!important}.reveal{opacity:1!important;transform:none!important}.cursor{display:none!important}</style></noscript>
 </head>
-<body>
+<body class="is-loading">
 
-<a class="skip-link" href="#main">跳到主要内容</a>
+<a class="skip" href="#main">跳到主要内容</a>
+
 <div class="grain" aria-hidden="true"></div>
-<div class="progress" id="progress" aria-hidden="true"></div>
-<div class="cursor" id="cursor" aria-hidden="true">
-  <span class="cursor-dot"></span>
-  <span class="cursor-ring"></span>
+<div class="cursor" id="cursor" aria-hidden="true"><span class="cursor-label" id="cursorLabel"></span></div>
+<div class="progress" aria-hidden="true"><i id="progressBar"></i></div>
+
+<div class="loader" id="loader" aria-hidden="true">
+  <div class="loader-top">
+    <span class="loader-brand">UMBRA<sup>®</sup></span>
+    <span class="mono loader-tag">VISUAL INDEX — 001</span>
+  </div>
+  <div class="loader-mid">
+    <span class="loader-count mono" id="loaderCount">00</span>
+  </div>
+  <div class="loader-bot">
+    <div class="loader-line"><i id="loaderBar"></i></div>
+    <div class="loader-meta mono"><span>INITIALISING</span><span>PLEASE WAIT</span></div>
+  </div>
 </div>
 
-<header class="site-head" id="siteHead">
-  <a class="brand" href="#top" aria-label="FORM 首页">
-    <span class="brand-name">FORM</span><span class="brand-dot">.</span>
-    <span class="brand-sub">INDEX</span>
-  </a>
-
-  <nav class="site-nav" aria-label="主导航">
-    <a href="#about" data-nav="about"><span>01</span>概览</a>
-    <a href="#work" data-nav="work"><span>02</span>作品</a>
-    <a href="#stack" data-nav="stack"><span>03</span>工具</a>
-    <a href="#now" data-nav="now"><span>04</span>现在</a>
-    <a href="#contact" data-nav="contact"><span>05</span>尾注</a>
+<header class="head" id="head">
+  <a class="brand" href="#top" aria-label="UMBRA 首页">UMBRA<sup>®</sup></a>
+  <nav class="nav" aria-label="主导航">
+    <a href="#thesis"><span class="nav-num">01</span><span class="scramble">THESIS</span></a>
+    <a href="#work"><span class="nav-num">02</span><span class="scramble">WORK</span></a>
+    <a href="#approach"><span class="nav-num">03</span><span class="scramble">APPROACH</span></a>
+    <a href="#log"><span class="nav-num">04</span><span class="scramble">LOG</span></a>
   </nav>
-
-  <div class="head-actions">
-    <button class="theme-btn" id="themeBtn" type="button" aria-label="切换深浅色">
-      <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true">
-        <circle cx="12" cy="12" r="4"></circle>
-        <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
-      </svg>
-      <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"></path>
-      </svg>
-    </button>
-    <a class="head-cta" href="#work">浏览 <span aria-hidden="true">↗</span></a>
-    <button class="menu-btn" id="menuBtn" type="button" aria-label="打开菜单" aria-expanded="false" aria-controls="mobileMenu">
+  <div class="head-right">
+    <span class="head-year mono">MMXXVI</span>
+    <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="menu" aria-label="打开菜单">
       <span></span><span></span>
     </button>
   </div>
 </header>
 
-<div class="mobile-menu" id="mobileMenu" aria-hidden="true">
-  <nav aria-label="移动端导航">
-    <a href="#about"><span>01</span>概览</a>
-    <a href="#work"><span>02</span>作品</a>
-    <a href="#stack"><span>03</span>工具</a>
-    <a href="#now"><span>04</span>现在</a>
-    <a href="#contact"><span>05</span>尾注</a>
+<div class="menu" id="menu" aria-hidden="true">
+  <nav class="menu-nav" aria-label="移动端导航">
+    <a href="#thesis"><span class="mn-num mono">01</span>THESIS</a>
+    <a href="#work"><span class="mn-num mono">02</span>WORK</a>
+    <a href="#approach"><span class="mn-num mono">03</span>APPROACH</a>
+    <a href="#log"><span class="mn-num mono">04</span>LOG</a>
+    <a href="#colophon"><span class="mn-num mono">05</span>COLOPHON</a>
   </nav>
-  <div class="mm-foot">
-    <a href="#work">作品索引 ↗</a>
-    <a href="#top">回到顶部 ↑</a>
-  </div>
+  <div class="menu-foot mono"><span>UMBRA — VISUAL INDEX</span><span>2026</span></div>
 </div>
 
 <main id="main">
 
   <section class="hero" id="top">
-    <div class="hero-bg" aria-hidden="true">
-      <div class="hero-glow"></div>
-      <div class="hero-grid"></div>
-      <svg class="orb" viewBox="0 0 600 600" fill="none" aria-hidden="true">
-        <defs>
-          <radialGradient id="orbFade" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stop-color="var(--accent)" stop-opacity=".16"/>
-            <stop offset="70%" stop-color="var(--accent)" stop-opacity=".04"/>
-            <stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/>
-          </radialGradient>
-        </defs>
-        <circle cx="300" cy="300" r="250" fill="url(#orbFade)"/>
-        <g class="orb-spin">
-          <circle cx="300" cy="300" r="220" stroke="currentColor" stroke-opacity=".22"/>
-          <circle cx="300" cy="300" r="170" stroke="currentColor" stroke-opacity=".12" stroke-dasharray="2 10"/>
-          <ellipse cx="300" cy="300" rx="220" ry="78" stroke="currentColor" stroke-opacity=".16" transform="rotate(-24 300 300)"/>
-          <ellipse cx="300" cy="300" rx="220" ry="78" stroke="currentColor" stroke-opacity=".16" transform="rotate(36 300 300)"/>
-          <ellipse cx="300" cy="300" rx="220" ry="78" stroke="currentColor" stroke-opacity=".16" transform="rotate(96 300 300)"/>
-          <circle cx="300" cy="300" r="5" fill="var(--accent)"/>
-          <circle cx="520" cy="300" r="4" fill="var(--accent)"/>
-          <circle cx="300" cy="80" r="3" fill="currentColor" fill-opacity=".55"/>
-        </g>
-        <g class="orb-spin orb-spin--rev">
-          <circle cx="300" cy="300" r="195" stroke="currentColor" stroke-opacity=".1" stroke-dasharray="1 14"/>
-          <circle cx="300" cy="105" r="3.5" fill="var(--accent)"/>
-          <circle cx="470" cy="450" r="2.5" fill="currentColor" fill-opacity=".5"/>
-        </g>
-      </svg>
+    <div class="hero-fallback" aria-hidden="true"></div>
+    <canvas class="hero-canvas" id="gl" aria-hidden="true"></canvas>
+    <div class="hero-mesh" aria-hidden="true"></div>
+
+    <div class="hero-top">
+      <p class="eyebrow mono">[ VISUAL INDEX ] <span>—</span> NO. 001</p>
+      <p class="hero-side mono" aria-hidden="true">ANONYMOUS BY DESIGN</p>
     </div>
 
-    <div class="wrap hero-wrap">
-      <div class="hero-copy">
-        <p class="eyebrow reveal">
-          <span class="status-dot" aria-hidden="true"></span>
-          <span>VISUAL STUDY</span>
-          <span class="sep">/</span>
-          <span>2026</span>
-        </p>
-
-        <h1 class="hero-title">
-          <span class="line"><span>BUILD</span></span>
-          <span class="line"><span>THINGS</span></span>
-          <span class="line"><span>THAT <em>RUN.</em></span></span>
-        </h1>
-
-        <p class="hero-lede reveal" style="--d:.12s">
-          一个关于排版、动效与界面的视觉实验。去掉名字与履历，只留下结构与节奏。
-        </p>
-
-        <div class="hero-actions reveal" style="--d:.2s">
-          <a class="btn btn-primary magnetic" href="#work">
-            <span>浏览作品</span>
-            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
-          </a>
-          <a class="btn btn-ghost magnetic" href="#stack">
-            <span>看看工具</span>
-            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"></path></svg>
-          </a>
-        </div>
-      </div>
-
-      <aside class="hero-side reveal" style="--d:.28s" aria-label="页面信息">
-        <div class="status-card">
-          <div class="sc-head">
-            <span>INDEX</span>
-            <span class="sc-live"><i aria-hidden="true"></i>LIVE</span>
-          </div>
-          <div class="sc-body">
-            <div class="sc-avatar" aria-hidden="true">
-              <span>F</span>
-              <i></i>
-            </div>
-            <div class="sc-row"><span>TYPE</span><b>视觉实验</b></div>
-            <div class="sc-row"><span>MODE</span><b>纯静态</b></div>
-            <div class="sc-row"><span>STACK</span><b>HTML · CSS · JS</b></div>
-            <div class="sc-row"><span>LOCAL</span><b class="mono" id="clock">--:--:--</b></div>
-          </div>
-          <div class="sc-foot">
-            <span>NO TRACKING</span>
-            <span>2026</span>
-          </div>
-        </div>
-      </aside>
+    <div class="hero-content">
+      <h1 class="hero-title">
+        <span class="line l1"><span class="line-inner">A STUDY</span></span>
+        <span class="line l2"><span class="line-inner">IN <em>SIGNAL</em></span></span>
+        <span class="line l3"><span class="line-inner"><span class="amp">&amp;</span> SILENCE.</span></span>
+      </h1>
+      <p class="hero-sub">在秩序与噪声之间，<br>寻找一种可以被看见的安静。</p>
     </div>
 
-    <div class="wrap hero-foot">
-      <span class="mono">SCROLL TO EXPLORE</span>
-      <span class="hero-line" aria-hidden="true"></span>
-      <span class="mono" id="heroYear">© 2026</span>
+    <div class="hero-foot">
+      <span class="mono">SCROLL <span class="hf-arrow">↓</span></span>
+      <span class="mono hf-mid">DESIGN / MOTION / TYPE</span>
+      <span class="mono hf-right">FRAME 001 — ∞</span>
     </div>
   </section>
 
@@ -180,105 +98,89 @@
     <div class="ticker-track" id="tickerTrack"></div>
   </div>
 
-  <section class="section" id="about">
-    <div class="wrap">
-      <div class="section-head">
-        <span class="sec-label">01 / 概览</span>
-        <h2 class="sec-title reveal">少一点噪音，<br>多一点结构。</h2>
+  <section class="section thesis" id="thesis">
+    <div class="sec-label"><span class="mono">01 / THESIS</span></div>
+    <div class="thesis-inner">
+      <p class="thesis-lede" data-split>Design is the space between what is said and what is felt.</p>
+      <div class="thesis-cols">
+        <p class="thesis-copy reveal">这一页不是一个简历，也不是一份说明书。它是一组被放在同一块黑色画布上的视觉练习：关于光、网格、字距，以及东西出现和消失的方式。</p>
+        <p class="thesis-copy reveal" style="--d:.1s">没有名字，没有头像，没有坐标。留下的只有判断：什么该被看见，什么应该退到暗处。</p>
       </div>
-
-      <div class="about-grid">
-        <div class="about-copy reveal">
-          <p class="lead">这是一页关于「怎么呈现」的练习：排版、留白、动效与克制。</p>
-          <p>没有履历，也没有联系方式，只有一条条可以被看见的界面实验。所有内容都由一份配置文件驱动，改几行字就能换一套叙事。</p>
-          <p class="muted">零依赖、无构建、纯静态——打开即用，不需要安装任何东西。</p>
-          <div class="about-links">
-            <a href="#work">作品索引 <span aria-hidden="true">↗</span></a>
-            <a href="#stack">工具箱 <span aria-hidden="true">↗</span></a>
-          </div>
-        </div>
-
-        <div class="about-facts reveal" style="--d:.12s">
-          <div class="fact"><span class="fact-k">方法</span><span class="fact-v">排版 / 动效</span></div>
-          <div class="fact"><span class="fact-k">技术</span><span class="fact-v">HTML · CSS · JS</span></div>
-          <div class="fact"><span class="fact-k">原则</span><span class="fact-v">零依赖 · 无构建</span></div>
-          <div class="fact"><span class="fact-k">状态</span><span class="fact-v"><i class="status-dot" aria-hidden="true"></i>持续打磨</span></div>
-        </div>
-      </div>
+      <div class="thesis-note mono reveal" style="--d:.2s">— A NOTE ON INTENT</div>
     </div>
   </section>
 
-  <section class="section section-work" id="work">
-    <div class="wrap">
-      <div class="section-head">
-        <span class="sec-label">02 / 作品</span>
-        <div class="head-row">
-          <h2 class="sec-title reveal">界面实验<span class="accent">.</span></h2>
-          <p class="sec-note reveal" style="--d:.1s">四个小练习，<br>颜色只在悬浮时出现。</p>
-        </div>
+  <section class="section work" id="work">
+    <div class="sec-head">
+      <div>
+        <span class="sec-label mono">02 / SELECTED WORK</span>
+        <h2 class="sec-title">FIVE STUDIES<br><em>IN FORM.</em></h2>
       </div>
-      <div class="work-list" id="workList"></div>
+      <p class="sec-intro">没有客户名，没有外链。只有五段被做完整的视觉练习，每一个都可以被打开。</p>
     </div>
+    <div class="work-list" id="workList"></div>
   </section>
 
-  <section class="section" id="stack">
-    <div class="wrap">
-      <div class="section-head">
-        <span class="sec-label">03 / 工具</span>
-        <h2 class="sec-title reveal">顺手的<span class="accent">家伙。</span></h2>
+  <section class="section approach" id="approach">
+    <div class="sec-head">
+      <div>
+        <span class="sec-label mono">03 / APPROACH</span>
+        <h2 class="sec-title">HOW IT<br><em>IS MADE.</em></h2>
       </div>
-      <div class="stack-grid" id="stackGrid"></div>
+      <p class="sec-intro">四条不太容易坚持的原则。它们决定一个页面最后是「能用」，还是「值得看」。</p>
     </div>
+    <div class="approach-grid" id="approachGrid"></div>
   </section>
 
-  <section class="section section-now" id="now">
-    <div class="wrap">
-      <div class="section-head">
-        <span class="sec-label">04 / 现在</span>
-        <h2 class="sec-title reveal">此刻<span class="accent">.</span></h2>
+  <section class="section log" id="log">
+    <div class="sec-head">
+      <div>
+        <span class="sec-label mono">04 / FIELD LOG</span>
+        <h2 class="sec-title">CURRENTLY<br><em>IN PROGRESS.</em></h2>
       </div>
-      <div class="now-grid">
-        <div class="now-intro reveal">
-          <p class="lead">不追热点，慢慢把手里的事情做完整。</p>
-          <p class="muted">这一页会随手更新，记录正在做、正在关注的东西。</p>
-        </div>
-        <div class="now-list reveal" style="--d:.12s" id="nowList"></div>
-      </div>
+      <p class="sec-intro">一些正在发生的事。没有日期承诺，只有状态。</p>
     </div>
-  </section>
-
-  <section class="contact" id="contact">
-    <div class="wrap">
-      <span class="sec-label">05 / 尾注</span>
-      <h2 class="contact-title reveal">页面结束，<br><span class="accent">想法继续。</span></h2>
-      <p class="contact-lede reveal" style="--d:.1s">一个纯视觉的静态页面：没有账号、没有表单、没有追踪。</p>
-      <div class="contact-actions reveal" style="--d:.18s">
-        <a class="contact-mail" href="#top">回到顶部 <span aria-hidden="true">↑</span></a>
-      </div>
-      <div class="contact-foot">
-        <span class="mono">NO COOKIES</span>
-        <span class="mono">NO TRACKING</span>
-        <span class="mono">2026</span>
-      </div>
-    </div>
+    <div class="log-list" id="logList"></div>
   </section>
 
 </main>
 
-<footer class="site-foot">
-  <div class="wrap foot-inner">
-    <span>© <span id="year">2026</span> FORM</span>
-    <span class="mono">DESIGNED &amp; BUILT AS A VISUAL STUDY</span>
-    <button id="toTop" class="to-top" type="button">回到顶部 ↑</button>
+<footer class="colophon" id="colophon">
+  <div class="colo-top">
+    <span class="sec-label mono">05 / COLOPHON</span>
+    <div class="colo-grid">
+      <p class="colo-copy">这一页没有账号、没有表单、没有追踪。只有光、网格，和一些被反复调整过的字。</p>
+      <button class="to-top" id="toTop" type="button" data-cursor="TOP">
+        <span class="tt-arrow" aria-hidden="true">↑</span>
+        <span class="tt-label mono">BACK TO TOP</span>
+      </button>
+    </div>
+  </div>
+  <div class="colo-word" aria-hidden="true">UMBRA</div>
+  <div class="colo-foot mono">
+    <span>© 2026 UMBRA — VISUAL INDEX</span>
+    <span>NO TRACKING · NO COOKIES · NO BUILD</span>
+    <span>DESIGNED IN THE DARK</span>
   </div>
 </footer>
 
-<div class="work-preview" id="workPreview" aria-hidden="true">
-  <div class="wp-visual" id="wpVisual" data-initial="F"></div>
-  <div class="wp-meta"><span id="wpIndex">01</span><span id="wpTitle">Project</span></div>
+<div class="work-float" id="workFloat" aria-hidden="true">
+  <div class="mesh" id="wfMesh"><i class="mesh-fill"></i><i class="mesh-grid"></i></div>
+  <span class="wf-index mono" id="wfIndex">01</span>
+  <span class="wf-label mono" id="wfLabel">NULL FIELD</span>
 </div>
 
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<dialog class="work-dialog" id="workDialog" aria-labelledby="wdTitle">
+  <div class="wd-visual"><div class="mesh" id="wdMesh"><i class="mesh-fill"></i><i class="mesh-grid"></i></div></div>
+  <div class="wd-body">
+    <button class="wd-close mono" id="wdClose" type="button" aria-label="关闭">CLOSE ✕</button>
+    <span class="wd-index mono" id="wdIndex">01</span>
+    <h2 class="wd-title" id="wdTitle">Null Field</h2>
+    <p class="wd-cn" id="wdCn">空场</p>
+    <p class="wd-desc" id="wdDesc"></p>
+    <dl class="wd-meta" id="wdMeta"></dl>
+  </div>
+</dialog>
 
 <script src="js/config.js"></script>
 <script src="js/main.js"></script>
