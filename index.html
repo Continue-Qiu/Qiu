@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FORM · INDEX — 视觉作品集</title>
+  <meta name="description" content="一个纯视觉的作品集：排版、留白与动效实验。零依赖、无构建的静态页面。">
+  <meta name="theme-color" content="#f2efe8">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="FORM · INDEX">
+  <meta property="og:description" content="一个纯视觉的作品集：排版、留白与动效实验。">
+  <meta name="twitter:card" content="summary">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="stylesheet" href="css/style.css">
+  <noscript><style>.reveal{opacity:1;transform:none}</style></noscript>
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('form-theme');
+        var theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+        document.documentElement.style.colorScheme = theme;
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', theme === 'dark' ? '#0c0c0b' : '#f2efe8');
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+
+<a class="skip-link" href="#main">跳到主要内容</a>
+<div class="grain" aria-hidden="true"></div>
+<div class="progress" id="progress" aria-hidden="true"></div>
+<div class="cursor" id="cursor" aria-hidden="true">
+  <span class="cursor-dot"></span>
+  <span class="cursor-ring"></span>
+</div>
+
+<header class="site-head" id="siteHead">
+  <a class="brand" href="#top" aria-label="FORM 首页">
+    <span class="brand-name">FORM</span><span class="brand-dot">.</span>
+    <span class="brand-sub">INDEX</span>
+  </a>
+
+  <nav class="site-nav" aria-label="主导航">
+    <a href="#about" data-nav="about"><span>01</span>概览</a>
+    <a href="#work" data-nav="work"><span>02</span>作品</a>
+    <a href="#stack" data-nav="stack"><span>03</span>工具</a>
+    <a href="#now" data-nav="now"><span>04</span>现在</a>
+    <a href="#contact" data-nav="contact"><span>05</span>尾注</a>
+  </nav>
+
+  <div class="head-actions">
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="切换深浅色">
+      <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="4"></circle>
+        <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+      </svg>
+      <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"></path>
+      </svg>
+    </button>
+    <a class="head-cta" href="#work">浏览 <span aria-hidden="true">↗</span></a>
+    <button class="menu-btn" id="menuBtn" type="button" aria-label="打开菜单" aria-expanded="false" aria-controls="mobileMenu">
+      <span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+  <nav aria-label="移动端导航">
+    <a href="#about"><span>01</span>概览</a>
+    <a href="#work"><span>02</span>作品</a>
+    <a href="#stack"><span>03</span>工具</a>
+    <a href="#now"><span>04</span>现在</a>
+    <a href="#contact"><span>05</span>尾注</a>
+  </nav>
+  <div class="mm-foot">
+    <a href="#work">作品索引 ↗</a>
+    <a href="#top">回到顶部 ↑</a>
+  </div>
+</div>
+
+<main id="main">
+
+  <section class="hero" id="top">
+    <div class="hero-bg" aria-hidden="true">
+      <div class="hero-glow"></div>
+      <div class="hero-grid"></div>
+      <svg class="orb" viewBox="0 0 600 600" fill="none" aria-hidden="true">
+        <defs>
+          <radialGradient id="orbFade" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="var(--accent)" stop-opacity=".16"/>
+            <stop offset="70%" stop-color="var(--accent)" stop-opacity=".04"/>
+            <stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <circle cx="300" cy="300" r="250" fill="url(#orbFade)"/>
+        <g class="orb-spin">
+          <circle cx="300" cy="300" r="220" stroke="currentColor" stroke-opacity=".22"/>
+          <circle cx="300" cy="300" r="170" stroke="currentColor" stroke-opacity=".12" stroke-dasharray="2 10"/>
+          <ellipse cx="300" cy="300" rx="220" ry="78" stroke="currentColor" stroke-opacity=".16" transform="rotate(-24 300 300)"/>
+          <ellipse cx="300" cy="300" rx="220" ry="78" stroke="currentColor" stroke-opacity=".16" transform="rotate(36 300 300)"/>
+          <ellipse cx="300" cy="300" rx="220" ry="78" stroke="currentColor" stroke-opacity=".16" transform="rotate(96 300 300)"/>
+          <circle cx="300" cy="300" r="5" fill="var(--accent)"/>
+          <circle cx="520" cy="300" r="4" fill="var(--accent)"/>
+          <circle cx="300" cy="80" r="3" fill="currentColor" fill-opacity=".55"/>
+        </g>
+        <g class="orb-spin orb-spin--rev">
+          <circle cx="300" cy="300" r="195" stroke="currentColor" stroke-opacity=".1" stroke-dasharray="1 14"/>
+          <circle cx="300" cy="105" r="3.5" fill="var(--accent)"/>
+          <circle cx="470" cy="450" r="2.5" fill="currentColor" fill-opacity=".5"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="wrap hero-wrap">
+      <div class="hero-copy">
+        <p class="eyebrow reveal">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span>VISUAL STUDY</span>
+          <span class="sep">/</span>
+          <span>2026</span>
+        </p>
+
+        <h1 class="hero-title">
+          <span class="line"><span>BUILD</span></span>
+          <span class="line"><span>THINGS</span></span>
+          <span class="line"><span>THAT <em>RUN.</em></span></span>
+        </h1>
+
+        <p class="hero-lede reveal" style="--d:.12s">
+          一个关于排版、动效与界面的视觉实验。去掉名字与履历，只留下结构与节奏。
+        </p>
+
+        <div class="hero-actions reveal" style="--d:.2s">
+          <a class="btn btn-primary magnetic" href="#work">
+            <span>浏览作品</span>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+          </a>
+          <a class="btn btn-ghost magnetic" href="#stack">
+            <span>看看工具</span>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"></path></svg>
+          </a>
+        </div>
+      </div>
+
+      <aside class="hero-side reveal" style="--d:.28s" aria-label="页面信息">
+        <div class="status-card">
+          <div class="sc-head">
+            <span>INDEX</span>
+            <span class="sc-live"><i aria-hidden="true"></i>LIVE</span>
+          </div>
+          <div class="sc-body">
+            <div class="sc-avatar" aria-hidden="true">
+              <span>F</span>
+              <i></i>
+            </div>
+            <div class="sc-row"><span>TYPE</span><b>视觉实验</b></div>
+            <div class="sc-row"><span>MODE</span><b>纯静态</b></div>
+            <div class="sc-row"><span>STACK</span><b>HTML · CSS · JS</b></div>
+            <div class="sc-row"><span>LOCAL</span><b class="mono" id="clock">--:--:--</b></div>
+          </div>
+          <div class="sc-foot">
+            <span>NO TRACKING</span>
+            <span>2026</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="wrap hero-foot">
+      <span class="mono">SCROLL TO EXPLORE</span>
+      <span class="hero-line" aria-hidden="true"></span>
+      <span class="mono" id="heroYear">© 2026</span>
+    </div>
+  </section>
+
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track" id="tickerTrack"></div>
+  </div>
+
+  <section class="section" id="about">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="sec-label">01 / 概览</span>
+        <h2 class="sec-title reveal">少一点噪音，<br>多一点结构。</h2>
+      </div>
+
+      <div class="about-grid">
+        <div class="about-copy reveal">
+          <p class="lead">这是一页关于「怎么呈现」的练习：排版、留白、动效与克制。</p>
+          <p>没有履历，也没有联系方式，只有一条条可以被看见的界面实验。所有内容都由一份配置文件驱动，改几行字就能换一套叙事。</p>
+          <p class="muted">零依赖、无构建、纯静态——打开即用，不需要安装任何东西。</p>
+          <div class="about-links">
+            <a href="#work">作品索引 <span aria-hidden="true">↗</span></a>
+            <a href="#stack">工具箱 <span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+
+        <div class="about-facts reveal" style="--d:.12s">
+          <div class="fact"><span class="fact-k">方法</span><span class="fact-v">排版 / 动效</span></div>
+          <div class="fact"><span class="fact-k">技术</span><span class="fact-v">HTML · CSS · JS</span></div>
+          <div class="fact"><span class="fact-k">原则</span><span class="fact-v">零依赖 · 无构建</span></div>
+          <div class="fact"><span class="fact-k">状态</span><span class="fact-v"><i class="status-dot" aria-hidden="true"></i>持续打磨</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-work" id="work">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="sec-label">02 / 作品</span>
+        <div class="head-row">
+          <h2 class="sec-title reveal">界面实验<span class="accent">.</span></h2>
+          <p class="sec-note reveal" style="--d:.1s">四个小练习，<br>颜色只在悬浮时出现。</p>
+        </div>
+      </div>
+      <div class="work-list" id="workList"></div>
+    </div>
+  </section>
+
+  <section class="section" id="stack">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="sec-label">03 / 工具</span>
+        <h2 class="sec-title reveal">顺手的<span class="accent">家伙。</span></h2>
+      </div>
+      <div class="stack-grid" id="stackGrid"></div>
+    </div>
+  </section>
+
+  <section class="section section-now" id="now">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="sec-label">04 / 现在</span>
+        <h2 class="sec-title reveal">此刻<span class="accent">.</span></h2>
+      </div>
+      <div class="now-grid">
+        <div class="now-intro reveal">
+          <p class="lead">不追热点，慢慢把手里的事情做完整。</p>
+          <p class="muted">这一页会随手更新，记录正在做、正在关注的东西。</p>
+        </div>
+        <div class="now-list reveal" style="--d:.12s" id="nowList"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="wrap">
+      <span class="sec-label">05 / 尾注</span>
+      <h2 class="contact-title reveal">页面结束，<br><span class="accent">想法继续。</span></h2>
+      <p class="contact-lede reveal" style="--d:.1s">一个纯视觉的静态页面：没有账号、没有表单、没有追踪。</p>
+      <div class="contact-actions reveal" style="--d:.18s">
+        <a class="contact-mail" href="#top">回到顶部 <span aria-hidden="true">↑</span></a>
+      </div>
+      <div class="contact-foot">
+        <span class="mono">NO COOKIES</span>
+        <span class="mono">NO TRACKING</span>
+        <span class="mono">2026</span>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-foot">
+  <div class="wrap foot-inner">
+    <span>© <span id="year">2026</span> FORM</span>
+    <span class="mono">DESIGNED &amp; BUILT AS A VISUAL STUDY</span>
+    <button id="toTop" class="to-top" type="button">回到顶部 ↑</button>
+  </div>
+</footer>
+
+<div class="work-preview" id="workPreview" aria-hidden="true">
+  <div class="wp-visual" id="wpVisual" data-initial="F"></div>
+  <div class="wp-meta"><span id="wpIndex">01</span><span id="wpTitle">Project</span></div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="js/config.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
